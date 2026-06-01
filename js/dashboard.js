@@ -1,11 +1,16 @@
 //read user ID
 const userId = localStorage.getItem("id");
 
+//prevents direct access to dashboard.html
+if(!userId){
+    window.location.href = "index.html";
+}
+
+
 //function to load contacts automatically into the table
 window.addEventListener('DOMContentLoaded', loadContacts);
 
 async function loadContacts(){
-
     try{
         const response = await fetch('/api/SearchContact.php', {
             method: 'POST',
@@ -41,7 +46,13 @@ async function loadContacts(){
     }
 }
 
-/***** add logout button!!! *****/
+/***** logout logic *****/
+document.getElementById('logout').addEventListener('click', logout);
+
+function logout(){
+    localStorage.removeItem("id");
+    window.location.href = "index.html";
+}
 
 //open add popup
 function openAdd(){
