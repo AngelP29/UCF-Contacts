@@ -1,12 +1,10 @@
 body{
-    background-color: #ffffff;
+    background-color: #fff;
     margin: 0;
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
     min-height: 100vh;
     display: flex;
-    overflow: hidden;
-    flex-direction: column;
 }
 
 .background {
@@ -38,6 +36,7 @@ body{
 
 main{
     flex: 1;
+    position: relative;
 }
 
 #home-page{
