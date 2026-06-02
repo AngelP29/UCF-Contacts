@@ -1,11 +1,14 @@
 //read user ID
 const userId = localStorage.getItem("id");
 
+/*
 //prevents direct access to dashboard.html
 if(!userId){
     window.location.href = "index.html";
 }
+*/
 
+var deleteMode = false;
 
 //function to load contacts automatically into the table
 window.addEventListener('DOMContentLoaded', loadContacts);
@@ -26,6 +29,7 @@ async function loadContacts(){
         const data = await response.json();
 
         if(data.error){
+            restoreNoContactsMessage();
             return;
         }
 
@@ -34,6 +38,7 @@ async function loadContacts(){
 
         for(const contact of data.results){
             addRowToTable(
+                contact.id,
                 contact.firstName,
                 contact.lastName,
                 contact.phone,
@@ -128,7 +133,7 @@ async function addContact(){
         console.log(data);
 
         if(data.id > 0){
-            addRowToTable(firstName, lastName, phoneNumber, emailAddress);
+            addRowToTable(data.id, firstName, lastName, phoneNumber, emailAddress);
             closeAll();
             clearAddForm();
         } else{
@@ -144,14 +149,137 @@ async function addContact(){
 
 }
 
-//handles deleting contact and related popup
-function deleteContact(){
-
-}
-
 //handles updating contact and related popup
 function updateContact(){
 
+}
+
+//handles selecting and deleting contacts
+document.getElementById('delete-contact').addEventListener('click', deleteSelector);
+document.getElementById('confirm-delete').addEventListener('click', openDeletePopup);
+document.querySelector('.action-delete').addEventListener('click', deleteContact);
+
+function deleteSelector(){
+    deleteMode = !deleteMode;
+
+    const deleteButton = document.getElementById('delete-contact');
+    const confirmButton = document.getElementById('confirm-delete');
+    const deleteBar = document.getElementById('delete-bar');
+    const tableHeader = document.getElementById('table-header');
+    const deleteColumns = document.querySelectorAll('.delete-column');
+
+    if(deleteMode){
+        deleteButton.classList.add('active');
+        confirmButton.style.display = 'inline-block';
+        deleteBar.style.display = 'block';
+        tableHeader.style.display = '';
+        deleteColumns.forEach(function(column){
+            column.style.display = '';
+        });
+
+    }
+    else{
+        deleteButton.classList.remove('active');
+        confirmButton.style.display = 'none';
+        deleteBar.style.display = 'none';
+        tableHeader.style.display = 'none';
+        deleteColumns.forEach(function(column){
+            column.style.display = 'none';
+        });
+        document.querySelectorAll('.delete-checkbox')
+            .forEach(function(box){
+                box.checked = false;
+            });
+    }
+}
+
+function openDeletePopup(){
+    const selectedRows = document.querySelectorAll('.delete-checkbox:checked');
+
+    if(selectedRows.length === 0){
+        alert('Select at least one contact.');
+        return;
+    }
+
+    const names = [];
+
+    selectedRows.forEach(function(box){
+
+        const row = box.closest('tr');
+
+        const firstName = row.children[1].textContent;
+
+        const lastName = row.children[2].textContent;
+
+        names.push(firstName + ' ' + lastName);
+    });
+
+    document.getElementById('selected-names')
+        .textContent = names.join(', ');
+
+    document.getElementById('confirm-delete-popup').style.display = 'flex';
+}
+
+async function deleteContact(){
+    const selectedRows = document.querySelectorAll(
+            '.delete-checkbox:checked'
+    );
+
+    try{
+        for(const checkbox of selectedRows){
+            const row = checkbox.closest('tr');
+
+            const contactId = row.dataset.contactId;
+
+            const response = await fetch('/api/DeleteContact.php',{
+                method: 'POST',
+                headers: {
+                    'Content-Type':
+                    'application/json'
+                },
+                body: JSON.stringify({
+                    contactId: contactId,
+                    userId: userId
+                })
+            });
+
+            const data = await response.json();
+
+            if(data.error){
+                alert(data.error);
+                continue;
+            }
+            row.remove();
+        }
+
+        closeAll();
+
+        if(deleteMode){
+            deleteSelector();
+        }
+
+        restoreNoContactsMessage();
+    }
+    catch(error){
+        console.error('Delete Contact Error:', error);
+        alert(error.message);
+    }
+}
+
+//helper for delete
+function restoreNoContactsMessage(){
+    const tbody = document.getElementById('contact-body');
+
+    if(tbody.children.length === 0){
+        tbody.innerHTML = 
+        `
+        <tr>
+            <td colspan="5">
+                No contacts found
+            </td>
+        </tr>
+        `;
+    }
 }
 
 //handles cancelling user action
@@ -160,15 +288,18 @@ function cancelAction(){
 }
 
 /***** helper functions *****/
-function addRowToTable(firstName, lastName, phoneNumber, emailAddress){
+function addRowToTable(contactId, firstName, lastName, phoneNumber, emailAddress){
     const tbody = document.getElementById('contact-body');
     if(tbody.children.length === 1 && tbody.children[0].textContent.includes('No contacts found')){
         tbody.innerHTML = '';
     }
 
     const tr = document.createElement('tr');
+
+    tr.dataset.contactId = contactId;
+
     tr.innerHTML = 
-        '<td style="display:none;"></td>' + 
+        '<td class="delete-column" style="display:none;">' + '<input type="checkbox" class="delete-checkbox">' + '</td>' +
         '<td>' + firstName + '</td>' +
         '<td>' + lastName + '</td>' +
         '<td>' + phoneNumber + '</td>' +
