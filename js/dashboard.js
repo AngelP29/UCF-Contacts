@@ -77,7 +77,19 @@ let selectedUpdate = null;
 function openUpdate(){
     const checkedBoxes = document.querySelectorAll('.delete-checkbox:checked');
 
-    if(checkedBoxes.length !== 1){
+    if(checkedBoxes.length === 0){
+
+        const tableHeader = document.getElementById('table-header');
+        const deleteColumns = document.querySelectorAll('.delete-column');
+
+        tableHeader.style.display = '';
+        deleteColumns.forEach(function(column){
+            column.style.display = '';
+        });
+
+        alert('Select one contact, then click Update again.');
+        return;
+    } else if(checkedBoxes.length !== 1){
         alert('Select exactly one contact.');
         return;
     }
