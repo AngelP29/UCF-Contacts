@@ -65,8 +65,35 @@ function openAdd(){
     document.getElementById('add-choice').style.display = 'flex';
 }
 
-function openUpdate(){
+document.getElementById('save-contact-btn').addEventListener('click', addContact);
 
+document.getElementById('update-contact-btn').addEventListener('click', updateContact);
+
+document.getElementById('update-contact').addEventListener('click', openUpdate);
+
+//update contact visual
+let selectedUpdate = null;
+
+function openUpdate(){
+    const checkedBoxes = document.querySelectorAll('.delete-checkbox:checked');
+
+    if(checkedBoxes.length !== 1){
+        alert('Select exactly one contact.');
+        return;
+    }
+
+    const row = checkedBoxes[0].closest('tr');
+
+    selectedUpdate = row;
+
+    document.getElementById('update-firstname').value = row.children[1].textContent;
+    document.getElementById('update-lastname').value = row.children[2].textContent;
+    document.getElementById('update-phone').value = row.children[3].textContent;
+    document.getElementById('update-email').value = row.children[4].textContent;
+
+    closeAll();
+
+    document.getElementById('update-choice').style.display = 'flex';
 }
 
 function closeAll(){
@@ -93,7 +120,7 @@ document.querySelectorAll('.action-cancel').forEach(function(button){
 });
 
 //save contact button
-document.querySelector('.action-save').addEventListener('click', addContact);
+//document.querySelector('.action-save').addEventListener('click', addContact);
 
 /***** Dashboard Actions *****/
 
@@ -150,8 +177,58 @@ async function addContact(){
 }
 
 //handles updating contact and related popup
-function updateContact(){
+async function updateContact(){
+    const firstName = document.getElementById('update-firstname').value.trim();
+    const lastName = document.getElementById('update-lastname').value.trim();
+    const phoneNumber = document.getElementById('update-phone').value.trim();
+    const emailAddress = document.getElementById('update-email').value.trim();
 
+    if(!selectedUpdate){
+        alert('No contact selected.');
+        return;
+    }
+
+    const contactId = selectedUpdate.dataset.contactId;
+
+    //API call 
+    const updateData = {
+        contactId: contactId,
+        firstName: firstName,
+        lastName: lastName,
+        phone: phoneNumber,
+        email: emailAddress,
+        userId: userId
+    };
+
+    try{
+        const response = await fetch("/api/UpdateContact.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        if(data.contactId > 0){
+            selectedUpdate.children[1].textContent = firstName;
+            selectedUpdate.children[2].textContent = lastName;
+            selectedUpdate.children[3].textContent = phoneNumber;
+            selectedUpdate.children[4].textContent = emailAddress;
+
+            selectedUpdate = null;
+
+            closeAll();
+        } else{
+            alert(data.error);
+        }
+    } catch(error){
+        console.log("Update Contact Error:", error);
+        alert(error.message);
+    }
 }
 
 //handles selecting and deleting contacts
