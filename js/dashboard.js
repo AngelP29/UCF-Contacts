@@ -392,16 +392,14 @@ async function deleteContact(){
 function restoreNoContactsMessage(){
     const tbody = document.getElementById('contact-body');
 
-    if(tbody.children.length === 0){
-        tbody.innerHTML = 
+    tbody.innerHTML = 
         `
         <tr>
             <td colspan="5">
                 No contacts found
             </td>
         </tr>
-        `;
-    }
+    `;
 }
 
 /***** helper functions *****/
