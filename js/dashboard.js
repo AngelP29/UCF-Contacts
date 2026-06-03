@@ -86,8 +86,7 @@ function openUpdate(){
         deleteColumns.forEach(function(column){
             column.style.display = '';
         });
-
-        alert('Select one contact, then click Update again.');
+        
         return;
     } else if(checkedBoxes.length !== 1){
         alert('Select exactly one contact.');
