@@ -1,12 +1,10 @@
 //read user ID
 const userId = localStorage.getItem("id");
 
-/*
 //prevents direct access to dashboard.html
 if(!userId){
     window.location.href = "index.html";
 }
-*/
 
 var deleteMode = false;
 
@@ -74,19 +72,28 @@ document.getElementById('update-contact').addEventListener('click', openUpdate);
 //update contact visual
 let selectedUpdate = null;
 
+let updateMode = false;
+
 function openUpdate(){
+    if(deleteMode){
+        deleteSelector();
+    }
+
+    if(!updateMode){
+        updateMode = true;
+
+        document.getElementById('table-header').style.display = '';
+
+        document.querySelectorAll('.delete-column').forEach(function(column){
+            column.style.display = '';
+        });
+        return; 
+    }
+
     const checkedBoxes = document.querySelectorAll('.delete-checkbox:checked');
 
     if(checkedBoxes.length === 0){
-
-        const tableHeader = document.getElementById('table-header');
-        const deleteColumns = document.querySelectorAll('.delete-column');
-
-        tableHeader.style.display = '';
-        deleteColumns.forEach(function(column){
-            column.style.display = '';
-        });
-        
+        exitUpdateMode();
         return;
     } else if(checkedBoxes.length !== 1){
         alert('Select exactly one contact.');
@@ -105,6 +112,21 @@ function openUpdate(){
     closeAll();
 
     document.getElementById('update-choice').style.display = 'flex';
+}
+
+function exitUpdateMode(){
+    updateMode = false;
+    selectedUpdate = null;
+
+    document.getElementById('table-header').style.display = 'none';
+
+    document.querySelectorAll('.delete-column').forEach(function(column){
+            column.style.display = 'none';
+    });
+
+    document.querySelectorAll('.delete-checkbox').forEach(function(box){
+            box.checked = false;
+    });
 }
 
 function closeAll(){
@@ -127,7 +149,13 @@ document.getElementById('add-contact').addEventListener('click', openAdd);
 
 //cancel button
 document.querySelectorAll('.action-cancel').forEach(function(button){
-    button.addEventListener('click', closeAll)
+    button.addEventListener('click', function(){
+        closeAll();
+
+        if(updateMode){
+            exitUpdateMode();
+        }
+    });
 });
 
 //save contact button
@@ -232,6 +260,8 @@ async function updateContact(){
 
             selectedUpdate = null;
 
+            exitUpdateMode();
+
             closeAll();
         } else{
             alert(data.error);
@@ -248,6 +278,10 @@ document.getElementById('confirm-delete').addEventListener('click', openDeletePo
 document.querySelector('.action-delete').addEventListener('click', deleteContact);
 
 function deleteSelector(){
+    if(updateMode){
+        exitUpdateMode();
+    }
+
     deleteMode = !deleteMode;
 
     const deleteButton = document.getElementById('delete-contact');

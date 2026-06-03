@@ -18,7 +18,13 @@
         }
         else
         {
-            returnWithError("No Contact Found, contact not updated");
+            returnWithInfo(
+                $inData["contactId"],
+                $inData["firstName"],
+                $inData["lastName"],
+                $inData["phone"],
+                $inData["email"]
+            );
         }
         $stmt->close();
         $conn->close();
