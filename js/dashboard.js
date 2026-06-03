@@ -404,11 +404,6 @@ function restoreNoContactsMessage(){
     }
 }
 
-//handles cancelling user action
-function cancelAction(){
-
-}
-
 /***** helper functions *****/
 function addRowToTable(contactId, firstName, lastName, phoneNumber, emailAddress){
     const tbody = document.getElementById('contact-body');
@@ -432,5 +427,67 @@ function addRowToTable(contactId, firstName, lastName, phoneNumber, emailAddress
 function clearAddForm(){
     ['add-firstname', 'add-lastname', 'add-phone', 'add-email'].forEach(function(id){
         document.getElementById(id).value = '';
+    });
+}
+
+//search contact logic
+//document.getElementById().addEventListener('click', searchContact);
+document.getElementById('search-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    searchContact();
+});
+
+async function searchContact(){
+    const searchInput = document.getElementById('searchContact').value.trim();
+
+    if(!searchInput){
+        loadContacts();
+        return;
+    }
+
+    try{
+        const response = await fetch("/api/SearchContact.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": 'application/json'
+            },
+            body: JSON.stringify({
+                search: searchInput,
+                userId: userId
+            })
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        if(data.error){
+            restoreNoContactsMessage(); 
+        } else{
+            renderContacts(data.results);
+        }
+    } catch(error){
+        console.error('Search Contact Error:', error);
+        alert("Search failed. Please try again.");
+    }
+}
+
+function renderContacts(contacts){
+    const tbody = document.getElementById('contact-body');
+    tbody.innerHTML = ''; // clear existing rows
+
+    if (contacts.length === 0) {
+        restoreNoContactsMessage();
+        return;
+    }
+
+    contacts.forEach(function(contact) {
+        addRowToTable(
+            contact.id,
+            contact.firstName,
+            contact.lastName,
+            contact.phone,
+            contact.email
+        );
     });
 }
