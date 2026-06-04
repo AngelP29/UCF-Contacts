@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Manager</title>
+    <title>UCF Contacts - Dashboard</title>
     <link rel="stylesheet" type="text/css" href="css/dashboard.css"> <!-- related CSS file -->
 </head>
 <body>
@@ -25,14 +25,14 @@
         </nav>
 
         <header id="main-header">
-            <h1 id="header">Dashboard</h1>
+            <h1 id="header" style="font-size:55px" >My Contacts</h1>
             <button type="button" id="logout" class="logout-btn">Logout</button>
         </header>
 
         <main>
             <section id="dashboard-content">
                 <div id="delete-bar" class="delete-bar" style="display: none;">
-                    <span id="delete-bar-text"> Select contacts using the checkboxes, then click Delete Selected</span>
+                    <span id="delete-bar-text"> Select contacts using the checkboxes, then click Delete</span>
                 </div>
 
                 <!-- contacts table -->
@@ -58,10 +58,6 @@
                 </div>
             </section>
         </main>
-
-        <footer class="footer">
-            <p>Copyright &copy; 2026 Contact Manager. All Rights Reserved</p>
-        </footer>
 
         <!-- add contact -->
         <div class="action-overlay" id="add-choice" style="display: none;">
