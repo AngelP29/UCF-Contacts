@@ -216,7 +216,7 @@ nav{
 .action-form label{
     display: block;
     font-size: 13px;
-    color: #fff;
+    color: #000;
     margin-bottom: 4px;
 }
 
@@ -285,7 +285,7 @@ nav{
 }
 
 .confirm-text{
-    color: #fff;
+    color: #000;
     margin-bottom: 8px;
 }
 
