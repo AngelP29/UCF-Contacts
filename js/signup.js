@@ -150,7 +150,7 @@ signupForm.addEventListener("submit", async function(event){
             // Check matching fields
             if(validateMatching(password, passwordConfirmation)){
                 matching(true);
-                missin
+                missingReq(false);
                 passwordValid(passwordInput, passwordConfirmationInput, passwordIcon, passwordConfIcon);
                 valid = true;
             } else {
