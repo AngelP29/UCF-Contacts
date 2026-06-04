@@ -380,7 +380,7 @@ async function deleteContact(){
             deleteSelector();
         }
 
-        restoreNoContactsMessage();
+        //restoreNoContactsMessage();
     }
     catch(error){
         console.error('Delete Contact Error:', error);
@@ -388,7 +388,7 @@ async function deleteContact(){
     }
 }
 
-//helper for delete
+//helper for restoring empty contact table
 function restoreNoContactsMessage(){
     const tbody = document.getElementById('contact-body');
 
