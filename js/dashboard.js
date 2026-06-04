@@ -11,6 +11,54 @@ var deleteMode = false;
 //function to load contacts automatically into the table
 window.addEventListener('DOMContentLoaded', loadContacts);
 
+
+const PHONE_REGEX = /^\+?1?\s*[-.]?\s*\(?\d{3}\)?[\s.\-]?\d{3}[\s.\-]?\d{4}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validatePhone(phone) {
+    return PHONE_REGEX.test(phone);
+}
+
+function validateEmail(email) {
+    return EMAIL_REGEX.test(email);
+}
+
+// Shows error message and highlights input
+function setFieldError(inputId, errorId, message) {
+    document.getElementById(inputId).classList.add('input-invalid');
+    document.getElementById(errorId).textContent = message;
+}
+
+// Clears error state from input
+function clearFieldError(inputId, errorId) {
+    document.getElementById(inputId).classList.remove('input-invalid');
+    document.getElementById(errorId).textContent = '';
+}
+
+// Validates phone + email for a given form prefix ('add' or 'update')
+// Returns true if both are valid
+function validateContactFields(prefix) {
+    const phone = document.getElementById(`${prefix}-phone`).value.trim();
+    const email = document.getElementById(`${prefix}-email`).value.trim();
+    let valid = true;
+
+    clearFieldError(`${prefix}-phone`, `${prefix}-phone-error`);
+    clearFieldError(`${prefix}-email`, `${prefix}-email-error`);
+
+    if (!validatePhone(phone)) {
+        setFieldError(`${prefix}-phone`, `${prefix}-phone-error`, 'Enter a valid phone number in the format 111-222-333)');
+        valid = false;
+    }
+
+    if (!validateEmail(email)) {
+        setFieldError(`${prefix}-email`, `${prefix}-email-error`, 'Enter a valid email address');
+        valid = false;
+    }
+
+    return valid;
+}
+
+
 async function loadContacts(){
     try{
         const response = await fetch('/api/SearchContact.php', {
@@ -133,6 +181,12 @@ function closeAll(){
     ['add-choice', 'update-choice', 'confirm-delete-popup'].forEach(function(id) {
         document.getElementById(id).style.display = 'none';
     });
+
+    // Clear validation state on close
+    ['add', 'update'].forEach(function(prefix) {
+        clearFieldError(`${prefix}-phone`, `${prefix}-phone-error`);
+        clearFieldError(`${prefix}-email`, `${prefix}-email-error`);
+    });
 }
 
 //escape key closes popup 
@@ -174,6 +228,9 @@ async function addContact(){
         alert('Please fill in all required fields.');
         return;
     }
+
+    // Validate phone and email format
+    if (!validateContactFields('add')) return;
 
     //API call 
     const contactData = {
@@ -226,6 +283,9 @@ async function updateContact(){
         alert('No contact selected.');
         return;
     }
+    
+    // Validate phone and email format
+    if (!validateContactFields('update')) return;
 
     const contactId = selectedUpdate.dataset.contactId;
 

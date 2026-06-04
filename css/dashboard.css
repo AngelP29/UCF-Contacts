@@ -173,6 +173,18 @@ nav{
     color: #000;
 }
 
+/* email/phone# field*/
+.field-error {
+    color: red;
+    font-size: 0.8rem;
+    display: block;
+    margin-top: 2px;
+}
+
+.input-invalid {
+    border: 1px solid red;
+}
+
 /* popup overlay */
 .action-overlay{
     position: fixed;
