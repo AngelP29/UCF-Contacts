@@ -1,6 +1,61 @@
 //following code takes inputs for login, and adds visual feedback based on input
 const signupForm = document.getElementById("inputs");
 
+
+function validateRequirements(password){
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return regex.test(password);
+}
+
+function missingReq(isMissing){
+    if(isMissing)
+        document.getElementById('req-password').style.display = 'inline';
+    if(!isMissing)
+        document.getElementById('req-password').style.display = 'none';
+}
+
+function matching(isMatching){
+    if(!isMatching)
+        document.getElementById('match-password').style.display = 'inline';
+    if(isMatching)
+        document.getElementById('match-password').style.display = 'none';
+}
+
+function validateMatching(password1, password2){
+    return password1 === password2;
+}
+
+function passwordError(passwordInput, passwordConfirmationInput, passwordIcon, passwordConfIcon){
+    passwordInput.classList.add("invalid");
+    passwordInput.classList.remove("valid");
+       
+    passwordIcon.textContent = "❌";
+    passwordIcon.className = "icon-error";
+    
+    passwordConfirmationInput.classList.add("invalid");
+    passwordConfirmationInput.classList.remove("valid");
+
+    passwordConfIcon.textContent = "❌";
+    passwordConfIcon.className = "icon-error";
+
+}
+
+function passwordValid(passwordInput, passwordConfirmationInput, passwordIcon, passwordConfIcon){
+    passwordInput.classList.add("valid");
+    passwordInput.classList.remove("invalid");
+
+    passwordIcon.textContent = "✅";
+    passwordIcon.className = "icon-success";
+ 
+    passwordConfirmationInput.classList.add("valid");
+    passwordConfirmationInput.classList.remove("invalid");
+
+    passwordConfIcon.textContent = "✅";
+    passwordConfIcon.className = "icon-success";
+}
+
+
+
 signupForm.addEventListener("submit", async function(event){
     event.preventDefault();
 
@@ -78,32 +133,32 @@ signupForm.addEventListener("submit", async function(event){
 
     //password validation
     if (!password || !passwordConfirmation){
-        passwordInput.classList.add("invalid");
-        passwordInput.classList.remove("valid");
-
-        passwordConfirmationInput.classList.add("invalid");
-        passwordConfirmationInput.classList.remove("valid");
-    
-        passwordIcon.textContent = "❌";
-        passwordIcon.className = "icon-error";
-
-        passwordConfIcon.textContent = "❌";
-        passwordConfIcon.className = "icon-error";
-
+        // Empty fields case
+        passwordError(passwordInput, passwordConfirmationInput, passwordIcon, passwordConfIcon);
         valid = false;
     } else {
-        //TODO validate password with regex 
-        passwordInput.classList.add("valid");
-        passwordInput.classList.remove("invalid");
-
-        passwordConfirmationInput.classList.add("valid");
-        passwordConfirmationInput.classList.remove("invalid");
-
-        passwordIcon.textContent = "✅";
-        passwordIcon.className = "icon-success";
-
-        passwordConfIcon.textContent = "✅";
-        passwordConfIcon.className = "icon-success";
+        // Non-empty fields case
+        // Check password meets requirements
+        if (!validateRequirements(password)) {
+            // Not meeting requirements 
+            missingReq(true);  
+            passwordError(passwordInput, passwordConfirmationInput, passwordIcon, passwordConfIcon);
+            valid = false;
+        } 
+        else {
+            // Meets requirements
+            // Check matching fields
+            if(validateMatching(password, passwordConfirmation)){
+                matching(true);
+                missin
+                passwordValid(passwordInput, passwordConfirmationInput, passwordIcon, passwordConfIcon);
+                valid = true;
+            } else {
+                matching(false);
+                passwordError(passwordInput, passwordConfirmationInput, passwordIcon, passwordConfIcon);
+                valid = false;
+            }
+        }
     }
 
     if(!valid){

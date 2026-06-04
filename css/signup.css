@@ -136,6 +136,10 @@ input{
     margin-bottom: 15px;
 }
 
+.passwordMatch{
+    color: red;
+}
+
 .valid{
     border: 2px solid green;
 }
