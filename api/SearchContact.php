@@ -16,7 +16,7 @@
 			 FROM CONTACTS 
 			 WHERE (FirstName LIKE ? OR LastName LIKE ? OR CONCAT(FirstName, ' ', LastName) LIKE ?)
 			 AND UserID=?");
-		$search = "%" . $inData["search"] . "%";
+		$search = $inData["search"] . "%";
 		$stmt->bind_param("sssi", $search, $search, $search, $inData["userId"]);
 		$stmt->execute();
 		
